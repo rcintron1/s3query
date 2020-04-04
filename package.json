@@ -9,6 +9,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "aws-sdk": "^2.653.0",
     "cross-env": "6.0.2",
     "electron-is-dev": "1.1.0",
     "electron-log": "^3.0.8",
