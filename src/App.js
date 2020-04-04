@@ -8,7 +8,35 @@ const s3 = new AWS.S3
 const sts = new AWS.STS
 
 const {app} = window.require('electron').remote;
+const footerStyle = {
+  backgroundColor: "black",
+  fontSize: "20px",
+  color: "white",
+  borderTop: "1px solid #E7E7E7",
+  textAlign: "center",
+  padding: "20px",
+  position: "fixed",
+  left: "0",
+  bottom: "0",
+  height: "60px",
+  width: "100%"
+};
 
+const phantomStyle = {
+  display: "block",
+  padding: "20px",
+  height: "60px",
+  width: "100%"
+};
+
+function Footer({ children }) {
+  return (
+    <div>
+      <div style={phantomStyle} />
+      <div style={footerStyle}>{children}</div>
+    </div>
+  );
+}
 const getCreds = () => {
   
 }
@@ -50,10 +78,11 @@ const App = () => {
         <h2>Clarabridge</h2>
       </div>
       {awsCreds?null:<Login setcreds={setawsCreds}/>}
+      <Footer>
       <p className="App-intro">
-        <b> Release 0.2.7 </b>
         Version: {app.getVersion()}
       </p>
+      </Footer>
     </div>
   );
 }
