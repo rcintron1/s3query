@@ -1,13 +1,11 @@
 import React, { Component, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import AWS from 'aws-sdk'
 
+const electron = window.require('electron');
+const fs = electron.remote.require('fs');
+const {app, ipcRenderer} = electron.remote;
 
-const s3 = new AWS.S3
-const sts = new AWS.STS
-
-const {app} = window.require('electron').remote;
 const footerStyle = {
   backgroundColor: "black",
   fontSize: "20px",
@@ -37,25 +35,32 @@ function Footer({ children }) {
     </div>
   );
 }
-const getCreds = () => {
+const getCreds = (mfa) => {
+  console.log()
+  const content = fs.readFileSync('/Users/rolando.cintron/.aws/credentials', { encoding: 'utf8' });
+  console.log(content)
   
+  
+  console.log("done")
+
 }
 
 const Login = (props)=> {
-  const [mfaKey, setMfaKey]= useState()
+  const [mfaKey, setMfaKey]= useState({value:''})
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log(getCreds(mfaKey));
     // get temporary tokens
 
-    setMfaKey('');
+    setMfaKey({value:''});
   };
   
   return (
     <form onSubmit={handleSubmit}>
       <input 
         type="text" 
-        value={mfaKey}
-        onChange={event => setMfaKey(event.target.value )}
+        value={mfaKey.value}
+        onChange={event => setMfaKey( {value: event.target.value })}
         placeholder="MultiFactor Key" 
         required 
       />
