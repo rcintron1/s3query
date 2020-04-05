@@ -30,15 +30,8 @@ function createWindow() {
   );
   mainWindow.on("closed", () => (mainWindow = null));
 }
-ipcMain.on('asynchronous-message', (event, arg) => {
-  console.log(arg) // prints "ping"
-  event.reply('asynchronous-reply', 'pong')
-})
 
-ipcMain.on('synchronous-message', (event, arg) => {
-  console.log(arg) // prints "ping"
-  event.returnValue = 'pong'
-})
+
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
@@ -52,3 +45,27 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+ipcMain.on('asynchronous-message', (event, arg) => {
+  console.log(arg) // prints "ping"
+  event.reply('asynchronous-reply', 'pong')
+})
+
+ipcMain.on('synchronous-message', async (event, arg) => {
+  console.log(arg, "test") // prints "ping"
+  try{
+    var params = {};
+    // AWS.config.getCredentials(function(err) {
+    //   if (err) console.log(err.stack); // credentials not loaded
+    //   else event.returnValue = AWS.config.credentials;
+    // })
+    const creds = AWS.Credentials
+    event.returnValue = creds
+   
+  }catch (e){
+    console.log(e)
+  }
+  
+  
+  // event.returnValue = 'pong'
+})

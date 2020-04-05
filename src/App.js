@@ -2,9 +2,11 @@ import React, { Component, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+const AWS = require('aws-sdk')
 const electron = window.require('electron');
 const fs = electron.remote.require('fs');
-const {app, ipcRenderer} = electron.remote;
+const {app} = electron.remote;
+const ipcRenderer = electron.ipcRenderer
 
 const footerStyle = {
   backgroundColor: "black",
@@ -36,10 +38,29 @@ function Footer({ children }) {
   );
 }
 const getCreds = (mfa) => {
-  console.log()
-  const content = fs.readFileSync('/Users/rolando.cintron/.aws/credentials', { encoding: 'utf8' });
-  console.log(content)
   
+  
+  try{
+    const localToken = ipcRenderer.sendSync('synchronous-message')
+    console.log(localToken)
+    const params = {
+      TokenCode:mfa.value,
+      DurationSeconds:3600,
+      SerialNumber: localToken.Arn.replace("user", "mfa")
+    }
+    console.log(params)
+    const sts = new AWS.STS({
+      accessKeyId: localToken.accessKeyId,
+      secretAccessKey: ""
+    })
+    // AWS.config()
+    // sts.getSessionToken(params, (err, data)=>{
+    //   if (err) console.log(err.message);
+    //   else console.log(data)
+    // })
+
+  }catch(e){console.log(e)}
+   
   
   console.log("done")
 
