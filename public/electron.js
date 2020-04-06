@@ -2,15 +2,11 @@ const electron = require("electron");
 const { ipcMain } = require('electron')
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-
+const awstools = require("../src/modules/awstools")
 const path = require("path");
 const isDev = require("electron-is-dev");
-const AWS = require('aws-sdk')
 
-
-const s3 = new AWS.S3
-const sts = new AWS.STS
-const iam = new AWS.IAM
+const globalData = {}
 
 let mainWindow;
 
@@ -46,21 +42,23 @@ app.on("activate", () => {
   }
 });
 
-ipcMain.on('asynchronous-message', (event, arg) => {
-  console.log(arg) // prints "ping"
-  event.reply('asynchronous-reply', 'pong')
-  mainWindow.webContents.send('info',"Testing message")
-})
+// ipcMain.on('asynchronous-message', (event, arg) => {
+//   console.log(arg) // prints "ping"
+//   event.reply('asynchronous-reply', 'pong')
+//   mainWindow.webContents.send('info',"Testing message")
+// })
 
-ipcMain.on('synchronous-message', async (event, arg) => {
-  console.log(arg, "test") // prints "ping"
-  mainWindow.webContents.send('info',"Testing message")
-  
-  event.returnValue = 'pong'
+ipcMain.on('getS3Data', async (event, arg) => {
+  console.log("argument received", arg)
+  globalData[arg] = await awstools.s3ListObjects(arg)
+  console.log(globalData)
+  globalData[arg+"reduced"]=awstools.s3BucketReduce(globalData[arg])
+  event.returnValue = globalData[arg+"reduced"]
 })
 count = 1
-setInterval(()=>{
-  count += 1
-  console.log("sending message to renderer")
-  mainWindow.webContents.send('info',`Testing message ${count}`)
-}, 10000)
+
+// setInterval(()=>{
+//   count += 1
+//   console.log("sending message to renderer")
+//   mainWindow.webContents.send('info',`Testing message ${count}`)
+// }, 10000)

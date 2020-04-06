@@ -50,64 +50,63 @@ const getMainMSG = ()=>{
 
 }
 
-const getCreds = (mfa) => {
-  try{
-    const localToken = ipcRenderer.sendSync('synchronous-message')
-    console.log(localToken)
-    const params = {
-      TokenCode:mfa.value,
-      DurationSeconds:3600,
-      SerialNumber: localToken.Arn.replace("user", "mfa")
-    }
-    console.log(params)
-    const sts = new AWS.STS({
-      accessKeyId: localToken.accessKeyId,
-      secretAccessKey: ""
-    })
-    // AWS.config()
-    // sts.getSessionToken(params, (err, data)=>{
-    //   if (err) console.log(err.message);
-    //   else console.log(data)
-    // })
+const getBucketData = (mfa) => {
 
-  }catch(e){console.log(e)}
-   
-  
-  console.log("done")
 
 }
 
-const Login = (props)=> {
-  const [mfaKey, setMfaKey]= useState({value:''})
+const S3Form = (props)=> {
+  const [s3BucketName, sets3BucketName]= useState({value:''})
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(getCreds(mfaKey));
+    try{
+      const bucketData = ipcRenderer.sendSync('getS3Data','cb-cloudflare-logs')
+      console.log("S3Form", )
+      props.setS3Data(Object.entries(bucketData))
+  
+    }catch(e){console.log(e)}
     // get temporary tokens
 
-    setMfaKey({value:''});
+    // sets3BucketName({value:''});
   };
   
   return (
     <form onSubmit={handleSubmit}>
       <input 
         type="text" 
-        value={mfaKey.value}
-        onChange={event => setMfaKey( {value: event.target.value })}
-        placeholder="MultiFactor Key" 
+        value={s3BucketName.value}
+        onChange={event => sets3BucketName( {value: event.target.value })}
+        placeholder="S3 Bucket Name" 
         required 
       />
-      <button>Authenticate with MFA</button>
+      <button>Fetch S3 Data</button>
     </form>
   );
 }
 
+// const S3TableList=(props)=>{
 
-const S3FileList = (props)=>{
-  return <div><h1>list of files</h1></div>
+//   return(
+//     <table>
+//       {props.s3Data.map(row=><tr><td>{row}</td></tr>)}
+//     </table>
+//   )
+// }
+
+const S3TableList = (props)=>{
+  console.log(props.s3Data)
+  return <div>
+    <table>
+      {props.s3Data.map(row=><tr>
+        <td>{row[0]}</td>
+        <td>{row[1]}</td>
+      </tr>)}
+    </table>
+  </div>
 }
 
 const App = () => {
-  const [awsCreds, setawsCreds] = useState()
+  const [s3Bucket, setS3Bucket] = useState()
   const [messages, setMessages] = useState("No messages")
   ipcRenderer.on('info' , function(event , data){ 
     console.log(event)
@@ -121,7 +120,8 @@ const App = () => {
         <h2>S3 Query Tool</h2>
         <StatusBar messages={messages}/>
       </div>
-      {awsCreds?null:<Login setcreds={setawsCreds}/>}
+      <S3Form setS3Data={setS3Bucket}/>
+      {s3Bucket?<S3TableList s3Data={s3Bucket} />:<p>No data</p>}
       <Footer>
       <p className="App-intro">
         Version: {app.getVersion()}
