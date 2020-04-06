@@ -49,23 +49,18 @@ app.on("activate", () => {
 ipcMain.on('asynchronous-message', (event, arg) => {
   console.log(arg) // prints "ping"
   event.reply('asynchronous-reply', 'pong')
+  mainWindow.webContents.send('info',"Testing message")
 })
 
 ipcMain.on('synchronous-message', async (event, arg) => {
   console.log(arg, "test") // prints "ping"
-  try{
-    var params = {};
-    // AWS.config.getCredentials(function(err) {
-    //   if (err) console.log(err.stack); // credentials not loaded
-    //   else event.returnValue = AWS.config.credentials;
-    // })
-    const creds = AWS.Credentials
-    event.returnValue = creds
-   
-  }catch (e){
-    console.log(e)
-  }
+  mainWindow.webContents.send('info',"Testing message")
   
-  
-  // event.returnValue = 'pong'
+  event.returnValue = 'pong'
 })
+count = 1
+setInterval(()=>{
+  count += 1
+  console.log("sending message to renderer")
+  mainWindow.webContents.send('info',`Testing message ${count}`)
+}, 10000)

@@ -37,9 +37,20 @@ function Footer({ children }) {
     </div>
   );
 }
+const StatusBar = (props) =>{
+  return <h2>{props.messages}</h2>
+}
+const getMainMSG = ()=>{
+  //Sending status from main process
+  ipcRenderer.on('info' , function(event , data){ 
+    console.log(event)
+    console.log(data)
+    return data
+  });
+
+}
+
 const getCreds = (mfa) => {
-  
-  
   try{
     const localToken = ipcRenderer.sendSync('synchronous-message')
     console.log(localToken)
@@ -97,11 +108,18 @@ const S3FileList = (props)=>{
 
 const App = () => {
   const [awsCreds, setawsCreds] = useState()
+  const [messages, setMessages] = useState("No messages")
+  ipcRenderer.on('info' , function(event , data){ 
+    console.log(event)
+    console.log(data)
+    setMessages(data)
+  });
   return (
     <div className="App">
       <div className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <h2>Clarabridge</h2>
+        <h2>S3 Query Tool</h2>
+        <StatusBar messages={messages}/>
       </div>
       {awsCreds?null:<Login setcreds={setawsCreds}/>}
       <Footer>

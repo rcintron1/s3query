@@ -26,22 +26,26 @@ const s3ListObjects = async (bucketName)=>{
     const params={
         Bucket: bucketName,
         MaxKeys: 500,
-        Delimiter: '.',
-        Marker: ""
     }
     let isTruncated
     const s3Objects=[]
     try{
         do {
-            const tempVal=await s3.listObjects(params).promise()
+            const tempVal=await s3.listObjectsV2(params).promise()
             s3Objects.push(...tempVal.Contents)
             isTruncated=tempVal.IsTruncated
-            params.Marker = s3Objects[-1].Key
+            params.StartAfter = tempVal.Contents[tempVal.Contents.length -1].Key
         }while (isTruncated === true)
         
     }catch(e){return {error: e}}
     return s3Objects
-
+}
+const s3BucketReduce = (listOfObjects)=>{
+    return listOfObjects.reduce((acc, curV, curI, array)=>{
+        const value = curV.Key.split(".").slice(-1)[0]
+        value in acc?acc[value]+=1:acc[value]=1
+        return acc
+    },{})
 }
 
 
@@ -53,6 +57,6 @@ const testIAM = ()=>{
 module.exports = {
     testCreds:testCreds,
     s3ListObjects: s3ListObjects,
-    s3ListBuckets: S3ListBuckets
-
+    s3ListBuckets: S3ListBuckets,
+    s3BucketReduce: s3BucketReduce
 }
