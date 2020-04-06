@@ -2,7 +2,7 @@ const electron = require("electron");
 const { ipcMain } = require('electron')
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-const awstools = require("../src/modules/awstools")
+const awstools = require("./awstools")
 const path = require("path");
 const isDev = require("electron-is-dev");
 
@@ -16,6 +16,7 @@ let mainWindow;
 //   updateInterval: "1 hour"
 // });
 
+
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 900, height: 680, webPreferences: { nodeIntegration: true }});
   isDev?mainWindow.webContents.openDevTools():null
@@ -24,6 +25,7 @@ function createWindow() {
       ? "http://localhost:3000"
       : `file://${path.join(__dirname, "../build/index.html")}`
   );
+  
   mainWindow.on("closed", () => (mainWindow = null));
 }
 
@@ -49,11 +51,18 @@ app.on("activate", () => {
 // })
 
 ipcMain.on('getS3Data', async (event, arg) => {
-  console.log("argument received", arg)
-  globalData[arg] = await awstools.s3ListObjects(arg)
-  console.log(globalData)
-  globalData[arg+"reduced"]=awstools.s3BucketReduce(globalData[arg])
-  event.returnValue = globalData[arg+"reduced"]
+  const bucketName= arg.Name;
+  console.log("getS3Data", arg, globalData[bucketName]?"true":"false")
+  if(!globalData[bucketName]) {
+    globalData[bucketName]={}
+    globalData[bucketName].data = await awstools.s3ListObjects(bucketName)
+  }
+  globalData[bucketName].startDate = arg.startDate;
+  globalData[bucketName].endDate = arg.endDate
+  console.log("getS3Data", globalData)
+  globalData[bucketName].extData=awstools.s3BucketReduce(globalData[bucketName],)
+  console.log(globalData[bucketName].extData)
+  event.returnValue = globalData[bucketName].extData
 })
 count = 1
 
