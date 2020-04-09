@@ -1,12 +1,16 @@
 # S3 Bucket Analyzer
 
+![image1](squery001.jpg) ![image2](squery002.jpg)
+
 ### Description:
 
 A very simple GUI using Electron and React that displays data related to the bucket.
 The main (eletron.js), it uses your local AWS credentials to make the API calls.
 Then it uses Electrons IPC communications to push this data to the frontend (needed since front end can't speak to local files)
 
+
 ---
+
 
 An example of using create-react-app and Electron.
 
