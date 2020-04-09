@@ -11,6 +11,7 @@
   "dependencies": {
     "aws-sdk": "^2.653.0",
     "cross-env": "6.0.2",
+    "dotenv": "^8.2.0",
     "electron-devtools-installer": "^2.2.4",
     "electron-is-dev": "1.1.0",
     "electron-log": "^3.0.8",
