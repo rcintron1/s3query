@@ -3,42 +3,26 @@ import logo from './logo.svg';
 import './App.css';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form'
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const electron = window.require('electron');
 const fs = electron.remote.require('fs');
 const {app} = electron.remote;
 const ipcRenderer = electron.ipcRenderer
 
-const footerStyle = {
-  backgroundColor: "black",
-  fontSize: "20px",
-  color: "white",
-  borderTop: "1px solid #E7E7E7",
-  textAlign: "center",
-  padding: "20px",
-  position: "fixed",
-  left: "0",
-  bottom: "0",
-  height: "60px",
-  width: "100%"
-};
-
-const phantomStyle = {
-  display: "block",
-  padding: "20px",
-  height: "60px",
-  width: "100%"
-};
-
 function Footer({ children }) {
   return (
     <div>
-      <div style={phantomStyle} />
-      <div style={footerStyle}>{children}</div>
+      <div className="phantomStyle" />
+      <div className="footerStyle">{children}</div>
     </div>
   );
 }
 const StatusBar = (props) =>{
-  return <h2>{props.messages}</h2>
+  return <h3>{props.messages}</h3>
 }
 const getMainMSG = ()=>{
   //Sending status from main process
@@ -59,8 +43,7 @@ const S3Form = (props)=> {
   console.log("s3form",props)
   const [s3BucketName, sets3BucketName]= useState({Name:''})
   const updateState = (event)=>{
-    // sets3BucketName( {Name: event.target.value })
-    props.setS3Bucket({...props.s3Bucket, Name:event.target.value})
+        props.setS3Bucket({...props.s3Bucket, Name:event.target.value})
   }
   const handleSubmit = async (event) => {
     // console.log(s3BucketName)
@@ -78,19 +61,22 @@ const S3Form = (props)=> {
   };
   
   return (
-    <form onSubmit={handleSubmit}>
-      <input 
+    <Form onSubmit={handleSubmit} >
+      {props.s3Bucket?
+      <div>  
+        <label for="bucketName">Bucket Name</label>
+        <input
+        id="bucketName"
         type="text" 
         value={props.s3Bucket.Name}
         // onChange={event => sets3BucketName( {Name: event.target.value })}
         onChange={updateState}
         placeholder="S3 Bucket Name" 
         required 
-      />
-      {props.s3Bucket?<div>  
+        />
         <div>
-            <p>Start Date</p>
-            <DatePicker
+          <label for="startDate">Start Date</label>
+            <DatePicker id="startDate"
               selected={props.s3Bucket.startDate}
               onChange={date => props.setS3Bucket(prevstate=>{
                 return {...prevstate,startDate:date}
@@ -101,24 +87,25 @@ const S3Form = (props)=> {
               timeCaption="time"
               dateFormat="MMMM d, yyyy h:mm aa"
             />
-          </div>
-          <div>
-            <p>End Date</p>
-            <DatePicker
-              selected={props.s3Bucket.endDate}
-              onChange={date => props.setS3Bucket(prevstate=>{
-                return {...prevstate,endDate:date}
-              })}
-              showTimeSelect
-              timeFormat="HH:mm"
-              timeIntervals={15}
-              timeCaption="time"
-              dateFormat="MMMM d, yyyy h:mm aa"
+        </div>
+        <div>
+            <label for="endDate">End Date</label>
+            <DatePicker id="endDate"
+            selected={props.s3Bucket.endDate}
+            onChange={date => props.setS3Bucket(prevstate=>{
+              return {...prevstate,endDate:date}
+            })}
+            showTimeSelect
+            timeFormat="HH:mm"
+            timeIntervals={15}
+            timeCaption="time"
+            dateFormat="MMMM d, yyyy h:mm aa"
             />
-          </div>
-        </div>:<p></p>}
-      <button>Fetch S3 Data</button>
-    </form>
+        </div>
+
+        </div>:<br />}
+      <Button variant="dark">Fetch S3 Data</Button>
+    </Form>
   );
 }
 
@@ -161,10 +148,12 @@ const App = () => {
         <h2>S3 Query Tool</h2>
         <StatusBar messages={messages}/>
       </div>
+      <div className="container"></div>
       <S3Form s3Bucket={s3Bucket} setS3Bucket={setS3Bucket}/>
       {s3Bucket.list?<div style={css}>
         <S3TableList style={css} s3Bucket={s3Bucket} />
-        <div style={css}>
+        {/* <div style={css}> */}
+        <div>
           
           <div style={css}>{s3Bucket.startDate?<p>{s3Bucket.startDate.toString()}</p>:<p>noStartDate</p>}</div>
         </div>
