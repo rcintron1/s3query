@@ -5,7 +5,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
-
+import InputGroup from 'react-bootstrap/InputGroup'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Table from 'react-bootstrap/Table'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const electron = window.require('electron');
@@ -59,24 +63,37 @@ const S3Form = (props)=> {
     }catch(e){console.log(e)}
 
   };
+  const colSize = 4
   
   return (
+    <Container>
     <Form onSubmit={handleSubmit} >
       {props.s3Bucket?
-      <div>  
-        <label for="bucketName">Bucket Name</label>
-        <input
-        id="bucketName"
-        type="text" 
-        value={props.s3Bucket.Name}
-        // onChange={event => sets3BucketName( {Name: event.target.value })}
-        onChange={updateState}
-        placeholder="S3 Bucket Name" 
-        required 
-        />
-        <div>
-          <label for="startDate">Start Date</label>
-            <DatePicker id="startDate"
+      <Col sm={8}>
+        <Row >
+          <InputGroup >
+            <InputGroup.Text className="SameWidth">S3 Bucket Name</InputGroup.Text>
+            <InputGroup.Append>
+            <input 
+              className="SameWidth"
+              id="bucketName"
+              type="text" 
+              value={props.s3Bucket.Name}
+              // onChange={event => sets3BucketName( {Name: event.target.value })}
+              onChange={updateState}
+              placeholder="S3 Bucket Name" 
+              required 
+            />
+            </InputGroup.Append>
+            
+          </InputGroup>
+        </Row>
+        <Row>
+          <InputGroup>
+          <InputGroup.Text className="SameWidth">Start Date</InputGroup.Text>
+          <InputGroup.Append>
+          <DatePicker id="startDate"
+            className="SameWidth"
               selected={props.s3Bucket.startDate}
               onChange={date => props.setS3Bucket(prevstate=>{
                 return {...prevstate,startDate:date}
@@ -87,10 +104,17 @@ const S3Form = (props)=> {
               timeCaption="time"
               dateFormat="MMMM d, yyyy h:mm aa"
             />
-        </div>
-        <div>
-            <label for="endDate">End Date</label>
-            <DatePicker id="endDate"
+          </InputGroup.Append>
+          
+          </InputGroup>
+         </Row>
+        <Row >
+          <InputGroup>
+          <InputGroup.Text className="SameWidth">End Date</InputGroup.Text>
+          <InputGroup.Append>
+          <DatePicker
+            className="SameWidth"
+            id="endDate"
             selected={props.s3Bucket.endDate}
             onChange={date => props.setS3Bucket(prevstate=>{
               return {...prevstate,endDate:date}
@@ -101,11 +125,18 @@ const S3Form = (props)=> {
             timeCaption="time"
             dateFormat="MMMM d, yyyy h:mm aa"
             />
-        </div>
+          </InputGroup.Append>
+          
+          </InputGroup>
+        </Row>
 
-        </div>:<br />}
-      <Button variant="dark">Fetch S3 Data</Button>
+      </Col>:<br />}
+      <Col as={Row} sm={4} >
+        <Button variant="dark" type="submit">Fetch S3 Data</Button>
+      </Col>
+      
     </Form>
+    </Container>
   );
 }
 
@@ -113,16 +144,24 @@ const S3TableList = (props)=>{
   console.log("S3TableList",props)
   const list = Object.entries(props.s3Bucket.list)
   
-  return <div style={props.css}>
-    <table>
+  return <>
+    <Table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>File Type</th>
+          <th>Count</th>
+        </tr>
+      </thead>
       <tbody>
         {list.map((row,i)=><tr key={i}>
+          <td >{i}</td>
           <td >{row[0]}</td>
           <td>{row[1]}</td>
         </tr>)}
       </tbody>
-    </table>
-  </div>
+    </Table>
+  </>
 }
 
 
@@ -135,12 +174,7 @@ const App = () => {
     console.log(data)
     setMessages(data)
   });
-  const css={
-    display: "flex",
-    width:"50%",
-    float:"left",
-    margin: "20px"
-  }
+
   return (
     <div className="App">
       <div className="App-header">
@@ -148,16 +182,16 @@ const App = () => {
         <h2>S3 Query Tool</h2>
         <StatusBar messages={messages}/>
       </div>
-      <div className="container"></div>
+      <div ></div>
       <S3Form s3Bucket={s3Bucket} setS3Bucket={setS3Bucket}/>
-      {s3Bucket.list?<div style={css}>
-        <S3TableList style={css} s3Bucket={s3Bucket} />
+      {s3Bucket.list?<Container>
+        <S3TableList s3Bucket={s3Bucket} />
         {/* <div style={css}> */}
         <div>
           
-          <div style={css}>{s3Bucket.startDate?<p>{s3Bucket.startDate.toString()}</p>:<p>noStartDate</p>}</div>
+          <div >{s3Bucket.startDate?<p>{s3Bucket.startDate.toString()}</p>:<p>noStartDate</p>}</div>
         </div>
-        </div>:<p>No data</p>
+        </Container>:<p>No data</p>
       }
       <Footer>
       <p className="App-intro">
