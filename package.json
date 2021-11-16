@@ -9,7 +9,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "aws-sdk": "^2.653.0",
+    "aws-sdk": "^2.814.0",
     "bootstrap": "^4.4.1",
     "cross-env": "6.0.2",
     "dotenv": "^8.2.0",
